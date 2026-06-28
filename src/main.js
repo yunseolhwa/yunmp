@@ -1,3 +1,4 @@
+const { WorldGenerator } = require("./world_gen.js");
 const { physicsStep, checkEdge, PhysicsEngine, GRAVITY, JUMP_FORCE, MAX_WALK_SPEED, WALK_ACCEL, FRICTION, AIR_RESISTANCE, AIR_ACCEL, TERMINAL_VELOCITY } = require("./physics.js");
 const { GASwarm } = require("./ga_swarm.js");
 
@@ -23,32 +24,18 @@ const { GASwarm } = require("./ga_swarm.js");
         }
 
         function initMap() {
-            absoluteWorld = []; let currentY = WORLD_H - 100;
-            absoluteWorld.push({ id: 0, x: WORLD_W/2 - 120, y: currentY, w: 240, h: 20, isTarget: true, level: 0, isSolid: false });
-            let numLevels = 20; let pId = 1; let side = 1;
-
-            for(let lvl = 1; lvl <= numLevels; lvl++) {
-                currentY -= 95;
-                let px = (WORLD_W/2) + (side * (30 + Math.random() * 40));
-                if (side === -1) px -= 40;
-                let pw = 25 + Math.random() * 20;
-
-                absoluteWorld.push({ id: pId++, x: px, y: currentY, w: pw, h: 10, isTarget: true, level: lvl, isSolid: false });
-
-                if (lvl > 1) {
-                    if (Math.random() < 0.6) {
-                        absoluteWorld.push({ id: pId++, x: px - 10, y: currentY - 40, w: pw + 20, h: 15, isTarget: false, level: lvl, isSolid: true });
-                    } else if (Math.random() < 0.5) {
-                        let trapX = side === 1 ? px - 30 : px + pw;
-                        absoluteWorld.push({ id: pId++, x: trapX, y: currentY - 20, w: 20, h: 40, isTarget: false, level: lvl, isSolid: true });
-                    }
-                }
-                side *= -1;
-            }
+            const worldGen = new WorldGenerator(WORLD_W, WORLD_H);
+            absoluteWorld = worldGen.generate(20, {
+                baseGapY: 95,
+                widthMin: 25,
+                widthVar: 20,
+                obstacleChance1: 0.6,
+                obstacleChance2: 0.5
+            });
             absoluteWorld.sort((a,b) => b.y - a.y);
             let targets = absoluteWorld.filter(p => p.isTarget);
             finalGoalPlat = targets[targets.length - 1];
-            addLog(`🌅 기억 상실증 치료 완료. 숲의 정상으로 향합니다.`, 'success');
+            addLog(`🌅 기억 상실증 치료 완료. 숲의 정상으로 향합니다. (Procedural Generation)`, 'success');
             spawnBot(true);
         }
 
