@@ -19,15 +19,15 @@
     </style>
 </head>
 <body>
-    <div id="app-container">
+    <div id="app-container" class="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto shadow-2xl ring-1 ring-amber-900/50 md:my-4 md:rounded-xl overflow-hidden">
         <!-- 헤더 UI -->
-        <div class="w-full bg-slate-950 border-b border-amber-800 p-2 flex justify-between items-center z-40 shrink-0" id="header-ui">
+        <div class="w-full bg-slate-950 border-b border-amber-800 p-2 md:p-3 flex justify-between items-center z-40 shrink-0" id="header-ui">
             <div class="flex flex-col">
                 <div class="flex items-center gap-1.5 mb-0.5">
                     <span class="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-amber-600 text-black rounded animate-pulse">V72.0 GRAND UNIFICATION</span>
-                    <span class="text-[9px] text-amber-400 font-bold">🌅 유실되었던 하향 도약(Down-Jump) & 체공 로직 복구</span>
+                    <span class="text-[9px] text-amber-400 font-bold hidden sm:inline">🌅 유실되었던 하향 도약(Down-Jump) & 체공 로직 복구</span>
                 </div>
-                <h1 class="text-xs font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">AI LAB: MEMORY RESTORED</h1>
+                <h1 class="text-xs md:text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">AI LAB: MEMORY RESTORED</h1>
             </div>
             <div class="flex flex-col items-end gap-1">
                 <div class="flex items-center gap-1 bg-black px-2 py-1 rounded border border-amber-600">
@@ -38,17 +38,17 @@
         </div>
 
         <!-- 캔버스 영역 -->
-        <div id="canvas-wrapper" id="canvas-bg">
+        <div id="canvas-wrapper" class="flex-1 w-full relative bg-[#1a0f0a] flex justify-center items-center overflow-hidden border-b-2 border-amber-600">
             <canvas id="gameCanvas"></canvas>
             <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-900 z-30">
                 <div id="compute-progress" class="h-full bg-amber-500 shadow-[0_0_15px_#d97706]"></div>
             </div>
 
             <div id="start-screen" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
-                <div class="text-center p-5 bg-slate-800 border border-amber-600 rounded-xl max-w-[85%] shadow-[0_0_40px_rgba(217,119,6,0.3)]">
+                <div class="text-center p-5 md:p-8 bg-slate-800 border border-amber-600 rounded-xl max-w-[85%] md:max-w-sm shadow-[0_0_40px_rgba(217,119,6,0.3)]">
                     <div class="text-4xl mb-3">🌅</div>
-                    <h2 class="text-base font-bold text-amber-400 mb-2">기억 상실증 치료 완료!</h2>
-                    <p class="text-[10px] text-gray-300 mb-5 leading-relaxed">코드 병합 과정에서 날려먹었던 "하향 도약 입력 마스킹 수정"과 "스카이다이빙 대기 로직"을 완벽하게 복원했습니다! 더 이상 머리 위의 가시덤불에 대가리를 박지 않고 우아하게 밑층으로 전술적 후퇴를 시전합니다.</p>
+                    <h2 class="text-base md:text-lg font-bold text-amber-400 mb-2">기억 상실증 치료 완료!</h2>
+                    <p class="text-[10px] md:text-xs text-gray-300 mb-5 leading-relaxed">코드 병합 과정에서 날려먹었던 "하향 도약 입력 마스킹 수정"과 "스카이다이빙 대기 로직"을 완벽하게 복원했습니다! 더 이상 머리 위의 가시덤불에 대가리를 박지 않고 우아하게 밑층으로 전술적 후퇴를 시전합니다.</p>
                     <button onclick="startSim()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-sm rounded-lg focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none active:scale-95 transition-transform border border-amber-400">
                         ▶ 대통합 시뮬레이션 가동
                     </button>
@@ -56,7 +56,7 @@
             </div>
 
             <!-- 시각 데이터 HUD -->
-            <div class="absolute top-2 right-2 bg-black/80 p-2 rounded border border-amber-700/50 text-[8px] font-mono text-amber-300 z-40 pointer-events-none w-36 flex flex-col items-end">
+            <div class="absolute top-2 right-2 bg-black/80 p-2 rounded border border-amber-700/50 text-[8px] md:text-[9px] font-mono text-amber-300 z-40 pointer-events-none w-36 md:w-44 flex flex-col items-end">
                 <div class="mb-1 border-b border-amber-700 pb-1 text-white font-bold text-[9px] w-full text-right">⚙️ 3D SWEEP CORE</div>
                 <div class="flex justify-between w-full"><span>투사 횟수:</span> <span id="probe-count" class="text-white font-bold">0 / 0</span></div>
                 <div class="flex justify-between w-full"><span>물리 상태:</span> <span id="jump-profile" class="text-orange-400 font-bold">NONE</span></div>
@@ -66,7 +66,7 @@
             </div>
 
             <!-- 진행도 HUD -->
-            <div class="absolute bottom-2 left-2 bg-black/80 p-2 rounded border border-amber-900 text-[9px] font-mono z-40 pointer-events-none w-32">
+            <div class="absolute bottom-2 left-2 bg-black/80 p-2 rounded border border-amber-900 text-[9px] font-mono z-40 pointer-events-none w-32 md:w-40">
                 <div class="flex justify-between items-center border-b border-amber-900 pb-1 mb-1">
                     <span class="text-amber-400 font-bold">FOREST EXPLORER</span>
                 </div>
@@ -76,12 +76,12 @@
         </div>
 
         <!-- 하단 로그 영역 -->
-        <div class="w-full bg-slate-950 p-2 z-40 shrink-0">
+        <div class="w-full bg-slate-950 p-2 md:p-3 z-40 shrink-0">
             <div class="flex justify-between items-center mb-1">
                 <span class="px-2 py-0.5 text-[9px] font-mono rounded bg-slate-800 text-amber-300 border border-amber-700">▶ 60FPS LOCKED / GRAVITY RESTORED</span>
                 <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
             </div>
-            <div id="log-box" role="log" aria-live="polite" aria-atomic="false" class="h-24 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
+            <div id="log-box" role="log" aria-live="polite" aria-atomic="false" class="h-24 md:h-32 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
                 <div class="text-amber-400 font-bold">[SYSTEM] 유실 코드 통합 완료. 하향 도약 시 일반 점프 스틸 버그 영구 제거.</div>
             </div>
         </div>
