@@ -1,0 +1,32 @@
+name: Kinematic AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 종속성 설치
+        run: npm install
+
+      - name: 코드 정적 분석 및 테스트
+        run: npm test
+
+      - name: 빌드 수행
+        run: npm run build
+
+      - name: 자동 배포 (GitHub Pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
