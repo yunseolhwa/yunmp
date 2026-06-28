@@ -1,5 +1,3 @@
-const tf = require('@tensorflow/tfjs');
-
 class GASwarm {
     constructor(populationSize, memoryBank) {
         this.populationSize = populationSize;

@@ -1,6 +1,27 @@
 const { physicsStep, checkEdge, PhysicsEngine, GRAVITY, JUMP_FORCE, MAX_WALK_SPEED, WALK_ACCEL, FRICTION, AIR_RESISTANCE, AIR_ACCEL, TERMINAL_VELOCITY } = require("./physics.js");
 const { GASwarm } = require("./ga_swarm.js");
 
+// Global Constants & Variables
+const WORLD_W = 1000;
+const WORLD_H = 3000;
+const GAME_W = 360;
+const GAME_H = 640;
+const FRAME_INTERVAL = 1000 / 60;
+
+let simActive = false;
+let lastFrameTime = 0;
+let cameraX = 0;
+let cameraY = 0;
+let absoluteWorld = [];
+let finalGoalPlat = null;
+let memoryBank = { generation: 1, maxReachedLevel: 0, penaltyRecords: [], slamMapData: new Set() };
+
+// Canvas Setup
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = GAME_W;
+canvas.height = GAME_H;
+
         let bot = {
             x: 0, y: 0, vx: 0, vy: 0, w: 14, h: 20, isGrounded: true, level: 0, platId: 0,
             state: 'SCANNING', scanTimer: 0, sosTimer: 0, probesCompleted: 0, targetProbes: 0,
@@ -78,6 +99,7 @@ const { GASwarm } = require("./ga_swarm.js");
             memoryBank.penaltyRecords = []; document.getElementById('rl-max-level').innerText = `0 F`;
             initMap(); simActive = true; lastFrameTime = performance.now(); requestAnimationFrame(gameLoopFn);
         }
+        window.forceRestart = forceRestart;
         function softRestart() { memoryBank.generation++; spawnBot(false); }
 
         function performDenseScan() {
@@ -365,7 +387,7 @@ const { GASwarm } = require("./ga_swarm.js");
 
             ctx.fillStyle = '#451a03';
             for(let i=-1000; i<WORLD_H; i+=300) { ctx.beginPath(); ctx.arc(WORLD_W/2, i+150, 80, 0, Math.PI*2); ctx.fill(); }
-            platforms.forEach(p => {
+            absoluteWorld.forEach(p => {
                 if (p.x + p.w > cameraX - 50 && p.x < cameraX + GAME_W + 50 && p.y > cameraY - 50 && p.y < cameraY + GAME_H + 50) {
                     let isKnown = memoryBank.slamMapData.has(p.id);
                     if (isKnown) {
@@ -487,10 +509,9 @@ const { GASwarm } = require("./ga_swarm.js");
             simActive = false;
             addLog("[SYSTEM] 학습 모드 트리거됨. 진화 알고리즘 스웜 가동...");
 
-            // Make sure the memory bank exists, we extract successful runs or create default DNA.
-            if (!swarmManager) {
-                swarmManager = new GASwarm(50, memoryBank.slamMapData ? [] : []);
-            }
+            // Always create a new swarmManager to ensure fresh DNA for the current position
+            swarmManager = new GASwarm(50, []);
+            
             if (!physicsEngine) {
                 physicsEngine = new PhysicsEngine(absoluteWorld);
             }
@@ -556,4 +577,5 @@ const { GASwarm } = require("./ga_swarm.js");
             }
         });
 
+        document.getElementById('learn-btn').addEventListener('click', runLearningMode);
         document.getElementById('start-btn').addEventListener('click', startSim);
