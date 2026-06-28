@@ -49,7 +49,7 @@
                     <div class="text-4xl mb-3">🌅</div>
                     <h2 class="text-base font-bold text-amber-400 mb-2">기억 상실증 치료 완료!</h2>
                     <p class="text-[10px] text-gray-300 mb-5 leading-relaxed">코드 병합 과정에서 날려먹었던 "하향 도약 입력 마스킹 수정"과 "스카이다이빙 대기 로직"을 완벽하게 복원했습니다! 더 이상 머리 위의 가시덤불에 대가리를 박지 않고 우아하게 밑층으로 전술적 후퇴를 시전합니다.</p>
-                    <button onclick="startSim()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-sm rounded-lg active:scale-95 transition-transform border border-amber-400">
+                    <button onclick="startSim()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-sm rounded-lg focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none active:scale-95 transition-transform border border-amber-400">
                         ▶ 대통합 시뮬레이션 가동
                     </button>
                 </div>
@@ -79,9 +79,9 @@
         <div class="w-full bg-slate-950 p-2 z-40 shrink-0">
             <div class="flex justify-between items-center mb-1">
                 <span class="px-2 py-0.5 text-[9px] font-mono rounded bg-slate-800 text-amber-300 border border-amber-700">▶ 60FPS LOCKED / GRAVITY RESTORED</span>
-                <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
+                <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
             </div>
-            <div id="log-box" class="h-24 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
+            <div id="log-box" role="log" aria-live="polite" aria-atomic="false" class="h-24 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
                 <div class="text-amber-400 font-bold">[SYSTEM] 유실 코드 통합 완료. 하향 도약 시 일반 점프 스틸 버그 영구 제거.</div>
             </div>
         </div>
