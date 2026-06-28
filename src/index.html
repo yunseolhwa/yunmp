@@ -81,7 +81,10 @@
         <div class="w-full bg-slate-950 p-2 z-40 shrink-0">
             <div class="flex justify-between items-center mb-1">
                 <span class="px-2 py-0.5 text-[9px] font-mono rounded bg-slate-800 text-amber-300 border border-amber-700">▶ 60FPS LOCKED / GRAVITY RESTORED</span>
-                <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
+                <div class="flex gap-2">
+                    <button id="learn-btn" class="px-3 py-1 bg-green-900/50 hover:bg-green-800 border border-green-700 rounded text-[9px] font-bold text-green-300">학습 시작 (L)</button>
+                    <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
+                </div>
             </div>
             <div id="log-box" class="h-24 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
                 <div class="text-amber-400 font-bold">[SYSTEM] 유실 코드 통합 완료. 하향 도약 시 일반 점프 스틸 버그 영구 제거.</div>
