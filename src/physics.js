@@ -22,19 +22,30 @@ function physicsStep(entity, keys, activePlatforms) {
     if (entity.vx < -MAX_WALK_SPEED) entity.vx = -MAX_WALK_SPEED;
 
     entity.x += entity.vx;
-    for (let p of activePlatforms) {
+
+    let activeLen = activePlatforms.length;
+    let ew = entity.w, eh = entity.h;
+    let ex = entity.x, ey = entity.y;
+    let exw = ex + ew, eyh = ey + eh;
+
+    for (let i = 0; i < activeLen; i++) {
+        let p = activePlatforms[i];
         if (p.isSolid) {
-            if (entity.x < p.x + p.w && entity.x + entity.w > p.x && entity.y < p.y + p.h && entity.y + entity.h > p.y) {
-                if (entity.vx > 0) { entity.x = p.x - entity.w; entity.vx = 0; }
-                else if (entity.vx < 0) { entity.x = p.x + p.w; entity.vx = 0; }
+            if (ex < p.x + p.w && exw > p.x && ey < p.y + p.h && eyh > p.y) {
+                if (entity.vx > 0) { entity.x = p.x - ew; entity.vx = 0; ex = entity.x; exw = ex + ew; }
+                else if (entity.vx < 0) { entity.x = p.x + p.w; entity.vx = 0; ex = entity.x; exw = ex + ew; }
             }
         }
     }
 
     // [V72 복원] 완벽한 else if 분기
     if (keys.down && keys.jump && entity.isGrounded && entity.level > 0) {
-        let curP = activePlatforms.find(p => Math.abs((entity.y + entity.h) - p.y) < 5 && entity.x + entity.w > p.x && entity.x < p.x + p.w);
-        if (curP && !curP.isSolid) { entity.y += 10; entity.vy = 0; entity.isGrounded = false; }
+        let curP = null;
+        for (let i = 0; i < activeLen; i++) {
+            let p = activePlatforms[i];
+            if (Math.abs(eyh - p.y) < 5 && exw > p.x && ex < p.x + p.w) { curP = p; break; }
+        }
+        if (curP && !curP.isSolid) { entity.y += 10; entity.vy = 0; entity.isGrounded = false; ey = entity.y; eyh = ey + eh; }
     } else if (keys.jump && entity.isGrounded) {
         entity.vy = JUMP_FORCE; entity.isGrounded = false;
     }
@@ -45,12 +56,14 @@ function physicsStep(entity, keys, activePlatforms) {
     }
 
     entity.y += entity.vy;
+    ey = entity.y; eyh = ey + eh;
 
     if (entity.vy < 0) {
-        for (let p of activePlatforms) {
-            if (entity.x < p.x + p.w && entity.x + entity.w > p.x && entity.y < p.y + p.h && entity.y + entity.h > p.y) {
+        for (let i = 0; i < activeLen; i++) {
+            let p = activePlatforms[i];
+            if (ex < p.x + p.w && exw > p.x && ey < p.y + p.h && eyh > p.y) {
                 if (p.isSolid) {
-                    entity.y = p.y + p.h; entity.vy = 0; entity.hitSolidCeiling = true;
+                    entity.y = p.y + p.h; entity.vy = 0; entity.hitSolidCeiling = true; ey = entity.y; eyh = ey + eh;
                 } else { entity.isPhasing = true; }
             }
         }
@@ -58,13 +71,17 @@ function physicsStep(entity, keys, activePlatforms) {
 
     if (entity.vy > 0) {
         let landed = false;
-        for (let p of activePlatforms) {
-            if (p.y > entity.y + entity.h + 20 || p.y < entity.y - entity.vy) continue;
-            let prevFoot = entity.y + entity.h - entity.vy;
-            let currFoot = entity.y + entity.h;
-            if (prevFoot <= p.y + 5 && currFoot >= p.y - 5) {
-                if (entity.x + entity.w > p.x && entity.x < p.x + p.w) {
-                    entity.y = p.y - entity.h; entity.vy = 0;
+        let pLimit1 = eyh + 20;
+        let pLimit2 = ey - entity.vy;
+        let prevFoot = eyh - entity.vy;
+
+        for (let i = 0; i < activeLen; i++) {
+            let p = activePlatforms[i];
+            if (p.y > pLimit1 || p.y < pLimit2) continue;
+
+            if (prevFoot <= p.y + 5 && eyh >= p.y - 5) {
+                if (exw > p.x && ex < p.x + p.w) {
+                    entity.y = p.y - eh; entity.vy = 0; ey = entity.y; eyh = ey + eh;
                     entity.isGrounded = true; entity.level = p.level; entity.platId = p.id;
                     landed = true; break;
                 }
@@ -76,8 +93,12 @@ function physicsStep(entity, keys, activePlatforms) {
 
 function checkEdge(entity, plats) {
     let onPlat = false;
-    for (let p of plats) {
-        if (Math.abs(entity.y + entity.h - p.y) < 5 && entity.x + entity.w > p.x && entity.x < p.x + p.w) { onPlat = true; break; }
+    let bottom = entity.y + entity.h;
+    let right = entity.x + entity.w;
+    let left = entity.x;
+    for (let i = 0, len = plats.length; i < len; i++) {
+        let p = plats[i];
+        if (Math.abs(bottom - p.y) < 5 && right > p.x && left < p.x + p.w) { onPlat = true; break; }
     }
     if (!onPlat) entity.isGrounded = false;
 }
