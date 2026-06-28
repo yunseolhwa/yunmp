@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Exterminator vs Protector: V72.0 Grand Unification</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <style>
+        @import url('[https://fonts.googleapis.com/css2?family=Dosis:wght@500;700&family=Noto+Sans+KR:wght@400;700;900&display=swap](https://fonts.googleapis.com/css2?family=Dosis:wght@500;700&family=Noto+Sans+KR:wght@400;700;900&display=swap)');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #050505; color: #e2e8f0; overflow: hidden; margin: 0; padding: 0; touch-action: none; }
+        #app-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #2a1106; }
+        #canvas-wrapper { flex: 1 1 auto; width: 100%; height: 50vh; min-height: 350px; position: relative; background-color: #1a0f0a; display: flex; justify-content: center; align-items: center; overflow: hidden; border-bottom: 2px solid #d97706; }
+        canvas { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background-color: transparent; }
+        @keyframes pulse-red { 0%, 100% { background-color: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); } 50% { background-color: rgba(239, 68, 68, 0.5); border-color: rgba(239, 68, 68, 1); } }
+        .sos-active { animation: pulse-red 1s infinite; }
+        @keyframes deep-thought { 0% { box-shadow: inset 0 0 10px #b45309; } 50% { box-shadow: inset 0 0 50px #d97706; } 100% { box-shadow: inset 0 0 10px #b45309; } }
+        .thinking-hard { animation: deep-thought 0.5s infinite; }
+        #compute-progress { width: 0%; transition: width 0.1s linear; }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- 헤더 UI -->
+        <div class="w-full bg-slate-950 border-b border-amber-800 p-2 flex justify-between items-center z-40 shrink-0" id="header-ui">
+            <div class="flex flex-col">
+                <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-amber-600 text-black rounded animate-pulse">V72.0 GRAND UNIFICATION</span>
+                    <span class="text-[9px] text-amber-400 font-bold">🌅 유실되었던 하향 도약(Down-Jump) & 체공 로직 복구</span>
+                </div>
+                <h1 class="text-xs font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">AI LAB: MEMORY RESTORED</h1>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+                <div class="flex items-center gap-1 bg-black px-2 py-1 rounded border border-amber-600">
+                    <span class="text-[9px] text-amber-500 font-bold">MODE:</span>
+                    <span class="text-xs text-white font-black">SUNSET FOREST</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 캔버스 영역 -->
+        <div id="canvas-wrapper" id="canvas-bg">
+            <canvas id="gameCanvas"></canvas>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-900 z-30">
+                <div id="compute-progress" class="h-full bg-amber-500 shadow-[0_0_15px_#d97706]"></div>
+            </div>
+
+            <div id="start-screen" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
+                <div class="text-center p-5 bg-slate-800 border border-amber-600 rounded-xl max-w-[85%] shadow-[0_0_40px_rgba(217,119,6,0.3)]">
+                    <div class="text-4xl mb-3">🌅</div>
+                    <h2 class="text-base font-bold text-amber-400 mb-2">기억 상실증 치료 완료!</h2>
+                    <p class="text-[10px] text-gray-300 mb-5 leading-relaxed">코드 병합 과정에서 날려먹었던 "하향 도약 입력 마스킹 수정"과 "스카이다이빙 대기 로직"을 완벽하게 복원했습니다! 더 이상 머리 위의 가시덤불에 대가리를 박지 않고 우아하게 밑층으로 전술적 후퇴를 시전합니다.</p>
+                    <button id="start-btn" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-sm rounded-lg active:scale-95 transition-transform border border-amber-400">
+                        ▶ 대통합 시뮬레이션 가동
+                    </button>
+                </div>
+            </div>
+
+            <!-- 시각 데이터 HUD -->
+            <div class="absolute top-2 right-2 bg-black/80 p-2 rounded border border-amber-700/50 text-[8px] font-mono text-amber-300 z-40 pointer-events-none w-36 flex flex-col items-end">
+                <div class="mb-1 border-b border-amber-700 pb-1 text-white font-bold text-[9px] w-full text-right">⚙️ 3D SWEEP CORE</div>
+                <div class="flex justify-between w-full"><span>투사 횟수:</span> <span id="probe-count" class="text-white font-bold">0 / 0</span></div>
+                <div class="flex justify-between w-full"><span>물리 상태:</span> <span id="jump-profile" class="text-orange-400 font-bold">NONE</span></div>
+                <div class="flex justify-between w-full mt-1 border-t border-amber-900 pt-1">
+                    <span id="bot-state" class="text-white font-bold w-full text-center">RESTING...</span>
+                </div>
+            </div>
+
+            <!-- 진행도 HUD -->
+            <div class="absolute bottom-2 left-2 bg-black/80 p-2 rounded border border-amber-900 text-[9px] font-mono z-40 pointer-events-none w-32">
+                <div class="flex justify-between items-center border-b border-amber-900 pb-1 mb-1">
+                    <span class="text-amber-400 font-bold">FOREST EXPLORER</span>
+                </div>
+                <div class="flex justify-between text-white"><span>최고 도달 층:</span> <span id="rl-max-level" class="text-white font-bold">0 F</span></div>
+                <div class="flex justify-between text-white mt-1"><span>현재 트래킹:</span> <span id="current-level" class="text-white font-bold">0 F</span></div>
+                <div class="flex justify-between text-white mt-1 border-t border-amber-900 pt-1"><span>학습 세대:</span> <span id="ga-gen" class="text-green-400 font-bold">Gen 0</span></div>
+                <div class="flex justify-between text-white mt-1"><span>최고 적합도:</span> <span id="ga-fitness" class="text-green-400 font-bold">0</span></div>
+            </div>
+        </div>
+
+        <!-- 하단 로그 영역 -->
+        <div class="w-full bg-slate-950 p-2 z-40 shrink-0">
+            <div class="flex justify-between items-center mb-1">
+                <span class="px-2 py-0.5 text-[9px] font-mono rounded bg-slate-800 text-amber-300 border border-amber-700">▶ 60FPS LOCKED / GRAVITY RESTORED</span>
+                <button onclick="forceRestart()" class="px-3 py-1 bg-red-900/50 hover:bg-red-800 border border-red-700 rounded text-[9px] font-bold text-red-300">태초마을로 (리셋)</button>
+            </div>
+            <div id="log-box" class="h-24 overflow-y-auto font-mono text-[9px] text-gray-400 space-y-0.5 bg-black p-1.5 rounded border border-slate-800">
+                <div class="text-amber-400 font-bold">[SYSTEM] 유실 코드 통합 완료. 하향 도약 시 일반 점프 스틸 버그 영구 제거.</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
