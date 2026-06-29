@@ -486,30 +486,34 @@ canvas.height = GAME_H;
             absoluteWorld.forEach(p => {
                 if (p.x + p.w > cameraX - 50 && p.x < cameraX + GAME_W + 50 && p.y > cameraY - 50 && p.y < cameraY + GAME_H + 50) {
                     let isKnown = memoryBank.slamMapData.has(p.id);
-                    if (isKnown) {
-                        if (p.isSolid) {
-                            ctx.fillStyle = '#451a03'; ctx.fillRect(p.x, p.y, p.w, p.h);
-                            ctx.fillStyle = '#94a3b8';
-                            for(let i=0; i<p.w; i+=8) { ctx.beginPath(); ctx.moveTo(p.x+i, p.y); ctx.lineTo(p.x+i+4, p.y-6); ctx.lineTo(p.x+i+8, p.y); ctx.fill(); }
-                            ctx.strokeStyle = '#ef4444'; ctx.strokeRect(p.x, p.y, p.w, p.h);
-                        } else {
-                            ctx.fillStyle = '#78350f'; ctx.fillRect(p.x, p.y, p.w, p.h);
-                            ctx.fillStyle = '#d97706'; ctx.fillRect(p.x, p.y, p.w, 4);
-                            ctx.strokeStyle = '#fcd34d'; ctx.strokeRect(p.x, p.y, p.w, p.h);
-                        }
+                    ctx.save();
+                    if (!isKnown) {
+                        ctx.globalAlpha = 0.25;
+                    }
 
-                        if (p.level > 0) {
-                            ctx.fillStyle = '#fef08a'; ctx.font = 'bold 9px Arial';
-                            ctx.fillText(p.isTarget ? `Lvl ${p.level}` : 'TRAP', p.x + p.w/2 - 12, p.y + 16);
-                        }
+                    if (p.isSolid) {
+                        ctx.fillStyle = '#451a03'; ctx.fillRect(p.x, p.y, p.w, p.h);
+                        ctx.fillStyle = '#94a3b8';
+                        for(let i=0; i<p.w; i+=8) { ctx.beginPath(); ctx.moveTo(p.x+i, p.y); ctx.lineTo(p.x+i+4, p.y-6); ctx.lineTo(p.x+i+8, p.y); ctx.fill(); }
+                        ctx.strokeStyle = '#ef4444'; ctx.strokeRect(p.x, p.y, p.w, p.h);
+                    } else {
+                        ctx.fillStyle = '#78350f'; ctx.fillRect(p.x, p.y, p.w, p.h);
+                        ctx.fillStyle = '#d97706'; ctx.fillRect(p.x, p.y, p.w, 4);
+                        ctx.strokeStyle = '#fcd34d'; ctx.strokeRect(p.x, p.y, p.w, p.h);
+                    }
 
-                        for(let record of memoryBank.penaltyRecords) {
-                            if (record.platId === p.id) {
-                                ctx.fillStyle = 'rgba(239, 68, 68, 0.8)'; ctx.fillRect(record.jumpX - 5, p.y - 12, 10, 10);
-                                ctx.fillStyle = 'white'; ctx.font = 'bold 10px Arial'; ctx.fillText('☠️', record.jumpX - 4, p.y - 4);
-                            }
+                    if (p.level > 0) {
+                        ctx.fillStyle = '#fef08a'; ctx.font = 'bold 9px Arial';
+                        ctx.fillText(p.isTarget ? `Lvl ${p.level}` : 'TRAP', p.x + p.w/2 - 12, p.y + 16);
+                    }
+
+                    for(let record of memoryBank.penaltyRecords) {
+                        if (record.platId === p.id) {
+                            ctx.fillStyle = 'rgba(239, 68, 68, 0.8)'; ctx.fillRect(record.jumpX - 5, p.y - 12, 10, 10);
+                            ctx.fillStyle = 'white'; ctx.font = 'bold 10px Arial'; ctx.fillText('☠️', record.jumpX - 4, p.y - 4);
                         }
                     }
+                    ctx.restore();
                 }
             });
 
