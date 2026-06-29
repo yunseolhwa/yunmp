@@ -24,7 +24,8 @@ class GASwarm {
             currentKeys: { left: false, right: false, jump: false, down: false, brake: false },
             stepIndex: 0,
             survivalTime: 0,
-            distanceToTarget: 9999
+            distanceToTarget: 9999,
+            collectedStarIds: new Set()
         };
     }
 
@@ -55,12 +56,21 @@ class GASwarm {
         });
     }
 
-    calculateFitness(targetX, targetY) {
+    calculateFitness(paramA, paramB) {
         this.population.forEach(agent => {
-            let dx = agent.x - targetX;
-            let dy = agent.y - targetY;
-            agent.distanceToTarget = Math.sqrt(dx*dx + dy*dy);
-            agent.fitness = (agent.level * 1000) - agent.distanceToTarget + agent.survivalTime;
+            if (paramB === undefined) {
+                let startingY = paramA;
+                let heightClimbed = startingY - agent.y;
+                let starsBonus = (agent.collectedStarIds ? agent.collectedStarIds.size : 0) * 1500;
+                agent.fitness = (heightClimbed * 10) + starsBonus + agent.survivalTime;
+            } else {
+                let targetX = paramA;
+                let targetY = paramB;
+                let dx = agent.x - targetX;
+                let dy = agent.y - targetY;
+                agent.distanceToTarget = Math.sqrt(dx*dx + dy*dy);
+                agent.fitness = (agent.level * 1000) - agent.distanceToTarget + agent.survivalTime;
+            }
             if (agent.fitness < 0) agent.fitness = 0;
         });
     }

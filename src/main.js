@@ -43,33 +43,97 @@ canvas.height = GAME_H;
             box.scrollTop = box.scrollHeight;
         }
 
-        function initMap() {
-            absoluteWorld = []; let currentY = WORLD_H - 100;
-            absoluteWorld.push({ id: 0, x: WORLD_W/2 - 120, y: currentY, w: 240, h: 20, isTarget: true, level: 0, isSolid: false });
-            let numLevels = 20; let pId = 1; let side = 1;
+        let stars = [];
+        let highestYGenerated = WORLD_H - 100;
+        let nextPlatformId = 1;
+        let nextStarId = 1;
+        let nextLvl = 1;
+        let side = 1;
+        let starsCollectedCount = 0;
 
-            for(let lvl = 1; lvl <= numLevels; lvl++) {
-                currentY -= 95;
+        function generatePlatformsUpTo(targetY) {
+            while (highestYGenerated > targetY) {
+                highestYGenerated -= 95;
                 let px = (WORLD_W/2) + (side * (30 + Math.random() * 40));
                 if (side === -1) px -= 40;
                 let pw = 25 + Math.random() * 20;
 
-                absoluteWorld.push({ id: pId++, x: px, y: currentY, w: pw, h: 10, isTarget: true, level: lvl, isSolid: false });
+                // Platform
+                absoluteWorld.push({
+                    id: nextPlatformId++,
+                    x: px,
+                    y: highestYGenerated,
+                    w: pw,
+                    h: 10,
+                    isTarget: true,
+                    level: nextLvl++,
+                    isSolid: false
+                });
 
-                if (lvl > 1) {
-                    if (Math.random() < 0.6) {
-                        absoluteWorld.push({ id: pId++, x: px - 10, y: currentY - 40, w: pw + 20, h: 15, isTarget: false, level: lvl, isSolid: true });
-                    } else if (Math.random() < 0.5) {
+                // Obstacles
+                if (nextLvl > 2) {
+                    if (Math.random() < 0.5) {
+                        absoluteWorld.push({
+                            id: nextPlatformId++,
+                            x: px - 10,
+                            y: highestYGenerated - 40,
+                            w: pw + 20,
+                            h: 15,
+                            isTarget: false,
+                            level: nextLvl - 1,
+                            isSolid: true
+                        });
+                    } else if (Math.random() < 0.4) {
                         let trapX = side === 1 ? px - 30 : px + pw;
-                        absoluteWorld.push({ id: pId++, x: trapX, y: currentY - 20, w: 20, h: 40, isTarget: false, level: lvl, isSolid: true });
+                        absoluteWorld.push({
+                            id: nextPlatformId++,
+                            x: trapX,
+                            y: highestYGenerated - 20,
+                            w: 20,
+                            h: 40,
+                            isTarget: false,
+                            level: nextLvl - 1,
+                            isSolid: true
+                        });
                     }
                 }
+
+                // Star Spawning
+                if (Math.random() < 0.4) {
+                    stars.push({
+                        id: nextStarId++,
+                        x: px + pw/2 - 5,
+                        y: highestYGenerated - 25,
+                        w: 10,
+                        h: 10,
+                        collected: false
+                    });
+                }
+
                 side *= -1;
             }
             absoluteWorld.sort((a,b) => b.y - a.y);
             let targets = absoluteWorld.filter(p => p.isTarget);
             finalGoalPlat = targets[targets.length - 1];
-            addLog(`🌅 기억 상실증 치료 완료. 숲의 정상으로 향합니다.`, 'success');
+        }
+
+        function initMap() {
+            absoluteWorld = [];
+            stars = [];
+            highestYGenerated = WORLD_H - 100;
+            nextPlatformId = 1;
+            nextStarId = 1;
+            nextLvl = 1;
+            side = 1;
+            starsCollectedCount = 0;
+
+            // Start platform
+            absoluteWorld.push({ id: 0, x: WORLD_W/2 - 120, y: highestYGenerated, w: 240, h: 20, isTarget: true, level: 0, isSolid: false });
+            
+            // Generate initial batch
+            generatePlatformsUpTo(WORLD_H - 2000);
+
+            addLog(`🌅 기억 상실증 치료 완료. 무한의 숲 정상을 향해 올라갑니다!`, 'success');
             spawnBot(true);
         }
 
@@ -173,6 +237,20 @@ canvas.height = GAME_H;
         }
 
         function updateAgent() {
+            // Endless Map Generation Trigger
+            if (bot.y < highestYGenerated + 1000) {
+                generatePlatformsUpTo(bot.y - 1000);
+            }
+
+            // Star Collection Collision Check
+            stars.forEach(s => {
+                if (!s.collected && bot.x < s.x + s.w && bot.x + bot.w > s.x && bot.y < s.y + s.h && bot.y + bot.h > s.y) {
+                    s.collected = true;
+                    starsCollectedCount++;
+                    addLog(`⭐️ 별을 획득했습니다! (총 수집: ${starsCollectedCount}개)`, 'success');
+                }
+            });
+
             document.getElementById('bot-state').innerText = bot.state;
             document.getElementById('jump-profile').innerText = bot.isGrounded ? "GROUNDED" : "FREE FALLING";
 
@@ -371,7 +449,7 @@ canvas.height = GAME_H;
             let targetCamX = bot.x + bot.w / 2 - GAME_W / 2;
             let targetCamY = bot.y + bot.h / 2 - GAME_H / 2 + 50;
             targetCamX = Math.max(0, Math.min(WORLD_W - GAME_W, targetCamX));
-            targetCamY = Math.max(-500, Math.min(WORLD_H - GAME_H, targetCamY));
+            targetCamY = Math.min(WORLD_H - GAME_H, targetCamY);
 
             let diffY = targetCamY - cameraY;
             if (Math.abs(diffY) > GAME_H / 2) cameraY += diffY * 0.15; else cameraY += diffY * 0.05;
@@ -382,11 +460,28 @@ canvas.height = GAME_H;
             ctx.save(); ctx.translate(Math.round(-cameraX), Math.round(-cameraY));
 
             ctx.fillStyle = '#1a0f0a';
-            ctx.fillRect(WORLD_W/2 - 70, -1000, 50, WORLD_H + 2000);
-            ctx.fillRect(WORLD_W/2 + 20, -1000, 60, WORLD_H + 2000);
+            ctx.fillRect(WORLD_W/2 - 70, cameraY - 100, 50, GAME_H + 200);
+            ctx.fillRect(WORLD_W/2 + 20, cameraY - 100, 60, GAME_H + 200);
 
             ctx.fillStyle = '#451a03';
-            for(let i=-1000; i<WORLD_H; i+=300) { ctx.beginPath(); ctx.arc(WORLD_W/2, i+150, 80, 0, Math.PI*2); ctx.fill(); }
+            let startBackgroundY = Math.floor((cameraY - 100) / 300) * 300;
+            for(let i = startBackgroundY; i < cameraY + GAME_H + 100; i += 300) {
+                ctx.beginPath(); ctx.arc(WORLD_W/2, i+150, 80, 0, Math.PI*2); ctx.fill();
+            }
+
+            // Draw Stars
+            stars.forEach(s => {
+                if (!s.collected && s.x + s.w > cameraX - 50 && s.x < cameraX + GAME_W + 50 && s.y > cameraY - 50 && s.y < cameraY + GAME_H + 50) {
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.shadowColor = '#fbbf24';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.arc(s.x + s.w/2, s.y + s.h/2, 5, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            });
+
             absoluteWorld.forEach(p => {
                 if (p.x + p.w > cameraX - 50 && p.x < cameraX + GAME_W + 50 && p.y > cameraY - 50 && p.y < cameraY + GAME_H + 50) {
                     let isKnown = memoryBank.slamMapData.has(p.id);
@@ -529,19 +624,30 @@ canvas.height = GAME_H;
                     agent.dead = false;
                     agent.stepIndex = 0;
                     agent.survivalTime = 0;
+                    agent.collectedStarIds = new Set();
                 });
 
                 // Run Headless Simulation Batch for 200 steps
                 for (let step = 0; step < 200; step++) {
                     swarmManager.updateAgentsActions();
                     physicsEngine.simulateBatch(swarmManager.population);
+
+                    // Check star collisions for each agent
+                    swarmManager.population.forEach(agent => {
+                        if (!agent.dead) {
+                            stars.forEach(s => {
+                                if (!s.collected && !agent.collectedStarIds.has(s.id)) {
+                                    if (agent.x < s.x + s.w && agent.x + agent.w > s.x && agent.y < s.y + s.h && agent.y + agent.h > s.y) {
+                                        agent.collectedStarIds.add(s.id);
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
 
-                // Calculate Fitness (We assume target is higher level and x=0 for simplicity, or we use targetPlat if available)
-                let targetX = bot.targetPlat ? bot.targetPlat.x + bot.targetPlat.w / 2 : 0;
-                let targetY = bot.targetPlat ? bot.targetPlat.y : -2000;
-
-                swarmManager.calculateFitness(targetX, targetY);
+                // Calculate Fitness based on height climbed relative to starting bot.y
+                swarmManager.calculateFitness(bot.y);
 
                 // Find the best in this generation
                 let currentBest = swarmManager.population.reduce((prev, current) => (prev.fitness > current.fitness) ? prev : current);
