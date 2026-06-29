@@ -44,34 +44,15 @@
                 <div id="compute-progress" class="h-full bg-amber-500 shadow-[0_0_15px_#d97706]"></div>
             </div>
 
-            <div id="start-screen" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
-                <div class="text-center p-5 bg-slate-800 border border-amber-600 rounded-xl max-w-[85%] shadow-[0_0_40px_rgba(217,119,6,0.3)]">
-                    <div class="text-4xl mb-3">🌅</div>
-                    <h2 class="text-base font-bold text-amber-400 mb-2">기억 상실증 치료 완료!</h2>
-                    <p class="text-[10px] text-gray-300 mb-5 leading-relaxed">코드 병합 과정에서 날려먹었던 "하향 도약 입력 마스킹 수정"과 "스카이다이빙 대기 로직"을 완벽하게 복원했습니다! 더 이상 머리 위의 가시덤불에 대가리를 박지 않고 우아하게 밑층으로 전술적 후퇴를 시전합니다.</p>
-                    <button id="start-btn" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-sm rounded-lg active:scale-95 transition-transform border border-amber-400">
-                        ▶ 대통합 시뮬레이션 가동
-                    </button>
-                </div>
-            </div>
-
-            <!-- 시각 데이터 HUD -->
-            <div class="absolute top-2 right-2 bg-black/80 p-2 rounded border border-amber-700/50 text-[8px] font-mono text-amber-300 z-40 pointer-events-none w-36 flex flex-col items-end">
-                <div class="mb-1 border-b border-amber-700 pb-1 text-white font-bold text-[9px] w-full text-right">⚙️ 3D SWEEP CORE</div>
-                <div class="flex justify-between w-full"><span>투사 횟수:</span> <span id="probe-count" class="text-white font-bold">0 / 0</span></div>
-                <div class="flex justify-between w-full"><span>물리 상태:</span> <span id="jump-profile" class="text-orange-400 font-bold">NONE</span></div>
-                <div class="flex justify-between w-full mt-1 border-t border-amber-900 pt-1">
-                    <span id="bot-state" class="text-white font-bold w-full text-center">RESTING...</span>
-                </div>
-            </div>
-
-            <!-- 진행도 HUD -->
-            <div class="absolute bottom-2 left-2 bg-black/80 p-2 rounded border border-amber-900 text-[9px] font-mono z-40 pointer-events-none w-32">
+            <!-- 진행도 & 상태 통합 HUD -->
+            <div class="absolute bottom-2 left-2 bg-black/80 p-2 rounded border border-amber-900 text-[9px] font-mono z-40 pointer-events-none w-36">
                 <div class="flex justify-between items-center border-b border-amber-900 pb-1 mb-1">
                     <span class="text-amber-400 font-bold">FOREST EXPLORER</span>
                 </div>
-                <div class="flex justify-between text-white"><span>최고 도달 층:</span> <span id="rl-max-level" class="text-white font-bold">0 F</span></div>
-                <div class="flex justify-between text-white mt-1"><span>현재 트래킹:</span> <span id="current-level" class="text-white font-bold">0 F</span></div>
+                <div class="flex justify-between text-white"><span>현재 위치:</span> <span id="current-level" class="text-white font-bold">0 F</span></div>
+                <div class="flex justify-between text-white mt-1"><span>수집한 별:</span> <span id="stars-count" class="text-yellow-400 font-bold">0개</span></div>
+                <div class="flex justify-between text-white mt-1"><span>물리 상태:</span> <span id="jump-profile" class="text-orange-400 font-bold">NONE</span></div>
+                <div class="flex justify-between text-white mt-1"><span>동작 상태:</span> <span id="bot-state" class="text-amber-400 font-bold">RESTING...</span></div>
                 <div class="flex justify-between text-white mt-1 border-t border-amber-900 pt-1"><span>학습 세대:</span> <span id="ga-gen" class="text-green-400 font-bold">Gen 0</span></div>
                 <div class="flex justify-between text-white mt-1"><span>최고 적합도:</span> <span id="ga-fitness" class="text-green-400 font-bold">0</span></div>
             </div>

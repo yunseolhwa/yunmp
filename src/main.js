@@ -2,10 +2,10 @@ const { physicsStep, checkEdge, PhysicsEngine, GRAVITY, JUMP_FORCE, MAX_WALK_SPE
 const { GASwarm } = require("./ga_swarm.js");
 
 // Global Constants & Variables
-const WORLD_W = 1000;
+const WORLD_W = 2000;
 const WORLD_H = 3000;
-const GAME_W = 360;
-const GAME_H = 640;
+const GAME_W = 1280;
+const GAME_H = 720;
 const FRAME_INTERVAL = 1000 / 60;
 
 let simActive = false;
@@ -160,7 +160,7 @@ canvas.height = GAME_H;
 
         function forceRestart() {
             simActive = false; memoryBank.generation = 1; memoryBank.maxReachedLevel = 0;
-            memoryBank.penaltyRecords = []; document.getElementById('rl-max-level').innerText = `0 F`;
+            memoryBank.penaltyRecords = []; document.getElementById('stars-count').innerText = `0개`;
             initMap(); simActive = true; lastFrameTime = performance.now(); requestAnimationFrame(gameLoopFn);
         }
         window.forceRestart = forceRestart;
@@ -248,6 +248,7 @@ canvas.height = GAME_H;
                     s.collected = true;
                     starsCollectedCount++;
                     addLog(`⭐️ 별을 획득했습니다! (총 수집: ${starsCollectedCount}개)`, 'success');
+                    document.getElementById('stars-count').innerText = `${starsCollectedCount}개`;
                 }
             });
 
@@ -338,7 +339,7 @@ canvas.height = GAME_H;
                     }
                 }
 
-                document.getElementById('probe-count').innerText = `${bot.probesCompleted} / ${bot.targetProbes}`;
+                // Probe count element removed
                 let progressPct = (bot.probesCompleted / bot.targetProbes) * 100;
                 document.getElementById('compute-progress').style.width = `${Math.min(100, progressPct)}%`;
 
@@ -411,7 +412,7 @@ canvas.height = GAME_H;
                         document.getElementById('current-level').innerText = `${bot.level} F`;
                         if (bot.level > memoryBank.maxReachedLevel) {
                             memoryBank.maxReachedLevel = bot.level;
-                            document.getElementById('rl-max-level').innerText = `${memoryBank.maxReachedLevel} F`;
+                            document.getElementById('stars-count').innerText = `${starsCollectedCount}개`;
                         }
                         bot.state = 'SCANNING'; bot.scanTimer = 30; bot.inputQueue = []; bot.guidePath = []; bot.isPhasing = false;
                         addLog(`[안착 성공] 인내의 숲 ${bot.level}층 도달!`, 'success');
@@ -577,7 +578,7 @@ canvas.height = GAME_H;
         }
 
         function startSim() {
-            document.getElementById('start-screen').style.display = 'none'; simActive = true; initMap();
+            simActive = true; initMap();
             lastFrameTime = performance.now(); requestAnimationFrame(gameLoopFn);
         }
 
@@ -684,4 +685,6 @@ canvas.height = GAME_H;
         });
 
         document.getElementById('learn-btn').addEventListener('click', runLearningMode);
-        document.getElementById('start-btn').addEventListener('click', startSim);
+
+        // Auto-start simulation immediately on load
+        startSim();
