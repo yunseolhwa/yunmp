@@ -79,7 +79,7 @@ class GASwarm {
             let parentA = this.selectParent();
             let parentB = this.selectParent();
             let childDNA = this.crossover(parentA.dna, parentB.dna);
-            childDNA = this.mutate(childDNA, 0.0);
+            childDNA = this.mutate(childDNA, 0.05);
             nextGeneration.push(this.createAgent(childDNA));
         }
 
