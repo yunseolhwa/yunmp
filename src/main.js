@@ -12,7 +12,23 @@ let simActive = false;
 let lastFrameTime = 0;
 let cameraX = 0;
 let cameraY = 0;
-let absoluteWorld = [];
+
+class WorldModel {
+    constructor() {
+        this.platforms = [];
+        this.obstacles = [];
+        this.stars = [];
+    }
+    clear() {
+        this.platforms.length = 0;
+        this.obstacles.length = 0;
+        this.stars.length = 0;
+    }
+}
+const worldModel = new WorldModel();
+const absoluteWorld = worldModel.platforms;
+const stars = worldModel.stars;
+
 let finalGoalPlat = null;
 let memoryBank = { generation: 1, maxReachedLevel: 0, penaltyRecords: [], slamMapData: new Set() };
 
@@ -43,7 +59,6 @@ canvas.height = GAME_H;
             box.scrollTop = box.scrollHeight;
         }
 
-        let stars = [];
         let highestYGenerated = WORLD_H - 100;
         let nextPlatformId = 1;
         let nextStarId = 1;
@@ -70,34 +85,6 @@ canvas.height = GAME_H;
                     isSolid: false
                 });
 
-                // Obstacles
-                if (nextLvl > 2) {
-                    if (Math.random() < 0.5) {
-                        absoluteWorld.push({
-                            id: nextPlatformId++,
-                            x: px - 10,
-                            y: highestYGenerated - 40,
-                            w: pw + 20,
-                            h: 15,
-                            isTarget: false,
-                            level: nextLvl - 1,
-                            isSolid: true
-                        });
-                    } else if (Math.random() < 0.4) {
-                        let trapX = side === 1 ? px - 30 : px + pw;
-                        absoluteWorld.push({
-                            id: nextPlatformId++,
-                            x: trapX,
-                            y: highestYGenerated - 20,
-                            w: 20,
-                            h: 40,
-                            isTarget: false,
-                            level: nextLvl - 1,
-                            isSolid: true
-                        });
-                    }
-                }
-
                 // Star Spawning
                 if (Math.random() < 0.4) {
                     stars.push({
@@ -118,8 +105,7 @@ canvas.height = GAME_H;
         }
 
         function initMap() {
-            absoluteWorld = [];
-            stars = [];
+            worldModel.clear();
             highestYGenerated = WORLD_H - 100;
             nextPlatformId = 1;
             nextStarId = 1;
